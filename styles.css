@@ -1,0 +1,136 @@
+@import url(./reset.css);
+@import url(./paperRipple/paperRipple.css);
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: hsl(0 0% 6%);
+		color: #fff;
+	}
+	button {
+		color: #fff;
+	}
+}
+
+.nav-header {
+	background-color: black;
+	padding: 1.5rem 0;
+}
+
+.nav-list {
+	display: flex;
+	gap: 0.3em;
+}
+
+.nav-links {
+	padding: 0.3em 0.3em;
+	border-radius: 0.25rem;
+}
+
+.brand {
+	margin: 0;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
+	gap: 2em;
+	margin: 2em;
+}
+
+.card {
+	padding: 1em;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	aspect-ratio: 1 / 0.8;
+	border-radius: 0.3rem;
+	background-color: hsl(0 0% 10%);
+}
+
+.btn {
+	color: #fff;
+	padding: 0.8em 1em;
+	border-radius: 0.3rem;
+	background-color: hsl(0 0% 10%);
+}
+.hero-heading {
+	margin-left: 2em;
+}
+/* Utilities Classes */
+
+.header-container {
+	width: min(90%, 1300px);
+	margin: 0 auto;
+}
+.container {
+	width: min(95%, 1500px);
+	margin: 0 auto;
+}
+.header-flex {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.mt-2 {
+	margin-top: 2em;
+}
+
+.btn-2 {
+	padding: 1em 1.3em;
+	border-radius: 0.4rem;
+	background-color: transparent;
+}
+
+.pill-shaped {
+	border-radius: 100vh;
+}
+
+.user-select {
+	user-select: text;
+}
+
+.ripple-purple {
+	--bg: 258 100% 65%;
+	--opacity: 0.3;
+	color: hsl(var(--bg));
+}
+.ripple-green {
+	--bg: 120 100% 65%;
+	--opacity: 0.3;
+
+	color: hsl(var(--bg));
+}
+.ripple-red {
+	--bg: 350 100% 65%;
+	--opacity: 0.3;
+
+	color: hsl(var(--bg));
+}
+.ripple-blue {
+	--bg: 216 100% 65%;
+	--opacity: 0.3;
+	color: hsl(var(--bg));
+}
+.ripple-orange {
+	--bg: 39 100% 65%;
+	--opacity: 0.3;
+
+	color: hsl(var(--bg));
+}
+
+.ripple-fab::before {
+	content: '';
+	z-index: -1;
+	border-radius: inherit;
+	position: absolute;
+	inset: 0;
+	background-color: var(--bg-clr);
+	opacity: 0;
+	transition: opacity 200ms ease-out 5ms;
+}
+
+@media (hover: hover) {
+	.ripple-fab:hover::before,
+	.ripple-fab:focus-visible::before {
+		opacity: 0.2;
+	}
+}
