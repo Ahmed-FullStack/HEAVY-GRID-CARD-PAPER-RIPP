@@ -88,31 +88,30 @@
 	user-select: text;
 }
 
+.ripple-opacity {
+	--opacity: 0.4;
+}
+
 .ripple-purple {
 	--bg: 258 100% 65%;
-	--opacity: 0.3;
 	color: hsl(var(--bg));
 }
 .ripple-green {
 	--bg: 120 100% 65%;
-	--opacity: 0.3;
 
 	color: hsl(var(--bg));
 }
 .ripple-red {
 	--bg: 350 100% 65%;
-	--opacity: 0.3;
 
 	color: hsl(var(--bg));
 }
 .ripple-blue {
 	--bg: 216 100% 65%;
-	--opacity: 0.3;
 	color: hsl(var(--bg));
 }
 .ripple-orange {
 	--bg: 39 100% 65%;
-	--opacity: 0.3;
 
 	color: hsl(var(--bg));
 }

@@ -1,98 +1,74 @@
+:root {
+	--cubic-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+}
 :where(.ripple) {
-	--bg: 0 0% 52%;
-	--opacity: 0.5;
-	--bg-clr: hsl(var(--bg) / var(--opacity, 0.5));
-	--shrt-ripple-opacity-delay: 200ms;
+	--bg-clr:  hsl(var(--bg, 0 0% 50%) / var(--opacity, 1));
+	--paper-ripple-duration-wms: 300;
+	--paper-ripple-scale: 1.2;
 
-	--shrt-ripple-scale-transduration: 650ms;
-	--shrt-ripple-opacity-transduration: calc(
-		var(--shrt-ripple-scale-transduration) - var(--shrt-ripple-opacity-delay)
+	--paper-ripple-opacity-duration-wms: 250;
+	--paper-ripple-opacity-duration: calc(
+		var(--paper-ripple-opacity-duration-wms) * 1ms
+	);
+	--paper-ripple-duration: calc(var(--paper-ripple-duration-wms) * 1ms);
+	--paper-ripple-bg: radial-gradient(
+		closest-side,
+		hsl(var(--bg, 0 0% 50%) / var(--opacity, 1)) max(100% - 35px, 85%),
+		transparent 100%
 	);
 
-	/* Delay for long ripple animation but not in ms for js*/
-
-	--lng-ripple-pointerdown-delay-woms: 80;
-
-	/* Delay for transition of opacity in long ripple animation for js */
-
-	--lng-ripple-delay-opacity-class: 150;
-
-	/* transition duration of opacity required for js to remove element at the right time  */
-
-	--lng-ripple-opacity-transduration-woms: 400;
-
-	--lng-ripple-scale-transduration-addition: 150ms;
-
-	--lng-ripple-scale-transduration: calc(
-		var(--shrt-ripple-scale-transduration) +
-			var(--lng-ripple-scale-transduration-addition)
-	);
-	--lng-ripple-opacity-transduration: calc(
-		var(--lng-ripple-opacity-transduration-woms) * 1ms
-	);
-	--ripple-br: 50%;
-	--blur-animate: 400ms;
 	appearance: none;
-	touch-action: none;
-	position: relative;
 	display: inline-block;
-	isolation: isolate;
+	position: relative;
 	z-index: 1;
 }
-.yt-paper-ripple,
-.waves-container,
-.waves {
-	overflow: hidden;
-	pointer-events: none;
-	z-index: -1;
-}
-.yt-paper-ripple,
-.waves-container {
+
+.mdc-ripple {
 	display: inline-block;
 	position: absolute;
 	inset: 0;
-	border-radius: inherit;
 	width: 100%;
 	height: 100%;
+	border-radius: inherit;
+	overflow: hidden;
+	z-index: -1;
+	pointer-events: none;
 }
 
-.waves {
+.mdc-ripple-wave {
+	--opacity: 0;
+	--opacity-end: 0.4;
 	position: absolute;
-	width: 100%;
-	aspect-ratio: 1 / 1;
-	background-color: var(--bg-clr);
-	border-radius: var(--ripple-br);
-	top: var(--y);
-	left: var(--x);
-	translate: -50% -50%;
-	scale: 0;
+	top: var(--y, 0%);
+	left: var(--x, 0%);
+	width: var(--max-value);
+	height: var(--max-value);
+	opacity: 0.84;
+	border-radius: 50%;
 }
 
-.waves.animate-short {
-	--scale: 3;
-	animation: animate-scale var(--shrt-ripple-scale-transduration, 450ms)
-			ease-out,
-		animate-opacity var(--shrt-ripple-opacity-transduration, 280ms) ease-out
-			var(--shrt-ripple-opacity-delay, 170ms);
-}
-.waves.animate-long {
-	--scale: 4;
-	animation: animate-scale var(--lng-ripple-scale-transduration, 450ms) ease-out
-		forwards;
+.mdc-ripple-wave-animate {
+	animation: paper-ripple var(--paper-ripple-duration, 200ms)
+		var(--cubic-bezier) forwards;
 }
 
-.waves.animate-opacity {
+.paper-ripple-opacity-animate {
 	opacity: 0;
-	transition: opacity var(--lng-ripple-opacity-transduration, 300ms) ease-out;
-}
-@keyframes animate-scale {
-	100% {
-		scale: var(--scale);
-	}
+	transition: opacity var(--paper-ripple-opacity-duration) ease-out;
 }
 
-@keyframes animate-opacity {
+@keyframes paper-ripple {
+	0% {
+		background: transparent;
+		scale: var(--paper-ripple-scale-start);
+
+		filter: blur(0.7rem);
+	}
 	100% {
-		opacity: 0;
+		background: var(--paper-ripple-bg);
+		top: 50%;
+		left: 50%;
+		translate: -50% -50%;
+		scale: var(--paper-ripple-scale-end);
 	}
 }

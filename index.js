@@ -1,3 +1,7 @@
-import PaperRipple from './paperRipple/PaperRipple.js'
-const btns = document.querySelectorAll('.ripple')
-PaperRipple(btns)
+import rippleElement from './paperRipple/PaperRipple.js';
+
+const ripples = document.querySelectorAll('.ripple');
+
+ripples.forEach(ripple => {
+	rippleElement(ripple);
+});

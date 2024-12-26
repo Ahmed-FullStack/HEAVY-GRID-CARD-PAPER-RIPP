@@ -1,220 +1,147 @@
-'use strict'
+'use strict';
 
-class paperRipple {
-	constructor(button) {
-		this.button = button
-		this.wavesContainer = this.rippleSetup()
-		this.#paperRipple()
+class RippleEffect {
+	constructor(el) {
+		this.el = el;
+		this.wavesContainer = this.createWavesContainer();
+		this.rippleElement();
 	}
 
-	rippleSetup() {
-		const paperRipple = document.createElement('paper-ripple')
-		paperRipple.classList.add('yt-paper-ripple')
-		this.button.appendChild(paperRipple)
-		const wavesContainer = document.createElement('div')
-		wavesContainer.classList.add('waves-container')
-		paperRipple.appendChild(wavesContainer)
-		return wavesContainer
+	setCoordinates(e, wave, keyboard = false) {
+		const { x, y, width, height } = e.target.getBoundingClientRect();
+
+		const max = Math.max(width, height);
+
+		wave.style.setProperty('--max-value', `${max}px`);
+
+		const xCoordinate = !keyboard
+			? (e.clientX - x - max / 2).toFixed(2)
+			: max / 2 - width / 2;
+		const yCoordinate = !keyboard
+			? (e.clientY - y - max / 2).toFixed(2)
+			: max / 2 - height / 2;
+		const hypotenus = Math.sqrt(Math.pow(height, 2) + Math.pow(width, 2));
+		const rippleScale = (hypotenus)/ max;
+
+		const customXCoordinate = !keyboard ? xCoordinate : -xCoordinate;
+		const customYCoordinate = !keyboard ? yCoordinate : -yCoordinate;
+
+		wave.style.setProperty('--x', `${customXCoordinate}px`);
+		wave.style.setProperty('--y', `${customYCoordinate}px`);
+		wave.style.setProperty(
+			'--paper-ripple-scale-start',
+			`${rippleScale.toFixed(2) / 3}`
+		);
+		wave.style.setProperty(
+			'--paper-ripple-scale-end',
+			`${rippleScale.toFixed(2)}`
+		);
 	}
-	createRippleDivs() {
-		let el = document.createElement('div')
-		el.classList.add('waves')
-		this.wavesContainer.appendChild(el)
-		return el
+
+	createWavesContainer() {
+		const ripple = document.createElement('div');
+
+		ripple.classList.add('mdc-ripple');
+		this.el.appendChild(ripple);
+
+		return ripple;
 	}
 
-	#paperRipple() {
-		const buttonStyle = window.getComputedStyle(this.button)
-		const opacityDelay = Number.parseFloat(
-			buttonStyle.getPropertyValue('--lng-ripple-opacity-transduration-woms')
-		)
-		const delayOpacityClass = Number.parseFloat(
-			buttonStyle.getPropertyValue('--lng-ripple-delay-opacity-class')
-		)
-		const longRippleDelay = Number.parseFloat(
-			buttonStyle.getPropertyValue('--lng-ripple-pointerdown-delay-woms')
-		)
-		const removeElementAfterOpacityDelay = opacityDelay + 1
+	createWave() {
+		const wave = document.createElement('div');
+		wave.classList.add('mdc-ripple-wave');
+		wave.classList.add('mdc-ripple-wave-animate');
 
-		this.button.addEventListener('pointerdown', e => {
-			const { x, y, width, height } = this.button.getBoundingClientRect()
+		this.wavesContainer.appendChild(wave);
 
-			const xCoordinatePX = e.clientX - x
-			const yCoordinatePX = e.clientY - y
+		return wave;
+	}
 
-			const xCoordinatePercentage = `${((xCoordinatePX / width) * 100).toFixed(
-				2
-			)}%`
-			const yCoordinatePercentage = `${((yCoordinatePX / height) * 100).toFixed(
-				2
-			)}%`
-			const { buttons } = e
-			if (buttons == 1) {
-				this.button.setPointerCapture(e.pointerId)
-				const longRipple = setTimeout(() => {
-					this.button.removeEventListener('pointerup', handlePointerUp)
+	handleRippleEvent(keyboard = false, e) {
+		if (keyboard === true) {
+			if (e.key !== ' ' && e.key !== 'Enter') return;
+			if (e.target !== this.el) return;
+			if (e.repeat) return;
 
-					const rippleElement = this.createRippleDivs()
+			const wave = this.createWave();
 
-					rippleElement.style.setProperty('--x', xCoordinatePercentage)
-					rippleElement.style.setProperty('--y', yCoordinatePercentage)
-					rippleElement.classList.add('animate-long')
-					this.button.addEventListener(
-						'pointerup',
-						e => {
-							setTimeout(() => {
-								rippleElement.classList.add('animate-opacity')
-								setTimeout(() => {
-									rippleElement.remove()
-								}, removeElementAfterOpacityDelay)
-							}, delayOpacityClass)
-						},
-						{ once: true }
-					)
-					this.button.addEventListener(
-						'drag',
-						e => {
-							console.log(`dragging`)
-							this.button.addEventListener(
-								'dragend',
-								e => {
-									setTimeout(() => {
-										rippleElement.classList.add('animate-opacity')
-										setTimeout(() => {
-											rippleElement.remove()
-										}, removeElementAfterOpacityDelay)
-									}, delayOpacityClass)
-								},
-								{ once: true }
-							)
-						},
-						{ once: true }
-					)
-					this.button.addEventListener(
-						'blur',
-						e => {
-							setTimeout(() => {
-								rippleElement.classList.add('animate-opacity')
-								setTimeout(() => {
-									rippleElement.remove()
-								}, removeElementAfterOpacityDelay)
-							}, delayOpacityClass)
-						},
-						{ once: true }
-					)
-				}, longRippleDelay)
+			this.setCoordinates(e, wave, true);
 
-				const handlePointerUp = e => {
-					clearTimeout(longRipple)
-					const rippleElement = this.createRippleDivs(this)
-					rippleElement.style.setProperty('--x', xCoordinatePercentage)
-					rippleElement.style.setProperty('--y', yCoordinatePercentage)
-					rippleElement.classList.add('animate-short')
-					rippleElement.addEventListener(
-						'animationend',
-						e => {
-							rippleElement.remove()
-						},
-						{ once: true }
-					)
-				}
-				this.button.addEventListener('pointerup', handlePointerUp, {
-					once: true,
-				})
-			}
-			// else if (buttons == 2) {
-			// 	this.button.addEventListener(
-			// 		'pointerup',
-			// 		(e) => {
-			// 			const rippleElement = this.createRippleDivs(this);
-			// 			rippleElement.style.setProperty('--x', xCoordinatePercentage);
-			// 			rippleElement.style.setProperty('--y', yCoordinatePercentage);
-			// 			rippleElement.classList.add('animate-like-blur');
-			// 			rippleElement.addEventListener(
-			// 				'animationend',
-			// 				(e) => {
-			// 					rippleElement.remove();
-			// 				},
-			// 				{ once: true }
-			// 			);
-			// 		},
-			// 		{ once: true }
-			// 	);
-			// }
-		})
+			const rippleRemoverFunction = this.removeRippleFunc.bind({
+				...this,
+				wave,
+			});
 
-		this.button.addEventListener('keydown', e => {
-			if (e.repeat) return
-			switch (e.key) {
-				case ' ':
-				case 'Enter':
-					const xCoordinatePercentage = `${50}%`
-					const yCoordinatePercentage = `${50}%`
-					const longRipple = setTimeout(() => {
-						this.button.removeEventListener('keyup', handlePointerUp)
+			this.el.addEventListener('keyup', rippleRemoverFunction, { once: true });
+		} else {
+			const e = arguments[0];
+			if (e.target !== this.el) return;
+			if (e.buttons !== 1) return;
 
-						const rippleElement = this.createRippleDivs()
+			const wave = this.createWave();
+			this.setCoordinates(e, wave);
 
-						rippleElement.style.setProperty('--x', xCoordinatePercentage)
-						rippleElement.style.setProperty('--y', yCoordinatePercentage)
-						rippleElement.classList.add('animate-long')
-						this.button.addEventListener(
-							'keyup',
-							e => {
-								if (e.key == ' ' || e.key == 'Enter') {
-									setTimeout(() => {
-										rippleElement.classList.add('animate-opacity')
-										setTimeout(() => {
-											rippleElement.remove()
-										}, removeElementAfterOpacityDelay)
-									}, delayOpacityClass)
-								}
-							},
-							{ once: true }
-						)
-						this.button.addEventListener(
-							'blur',
-							e => {
-								setTimeout(() => {
-									rippleElement.classList.add('animate-opacity')
-									setTimeout(() => {
-										rippleElement.remove()
-									}, removeElementAfterOpacityDelay)
-								}, delayOpacityClass)
-							},
-							{ once: true }
-						)
-					}, longRippleDelay)
+			const rippleRemoverFunction = this.removeRippleFunc.bind({
+				...this,
+				wave,
+			});
 
-					const handlePointerUp = e => {
-						clearTimeout(longRipple)
-						const rippleElement = this.createRippleDivs(this)
-						rippleElement.style.setProperty('--x', xCoordinatePercentage)
-						rippleElement.style.setProperty('--y', yCoordinatePercentage)
-						rippleElement.classList.add('animate-short')
-						rippleElement.addEventListener(
-							'animationend',
-							e => {
-								rippleElement.remove()
-							},
-							{ once: true }
-						)
-					}
-					this.button.addEventListener('keyup', handlePointerUp, {
-						once: true,
-					})
+			this.el.addEventListener('pointerup', rippleRemoverFunction, {
+				once: true,
+			});
+			this.el.addEventListener('pointerleave', rippleRemoverFunction, {
+				once: true,
+			});
+			this.el.addEventListener('dragend', rippleRemoverFunction, {
+				once: true,
+			});
+		}
+	}
 
-					break
+	removeRippleFunc(e) {
+		const styles = window.getComputedStyle(e.target);
 
-				default:
-					break
-			}
-		})
+		const waveRemoveDelay = styles.getPropertyValue(
+			'--paper-ripple-duration-wms'
+		);
+		const waveOpacityMS = styles.getPropertyValue(
+			'--paper-ripple-opacity-duration-wms'
+		);
+
+		setTimeout(() => {
+			this.wave.classList.add('paper-ripple-opacity-animate');
+			setTimeout(() => {
+				this.wave.remove();
+			}, waveOpacityMS);
+		}, waveRemoveDelay);
+	}
+
+	rippleElement() {
+		this.el.classList.add('ripple');
+
+		this.el.addEventListener('pointerdown', this.handleRippleEvent.bind(this));
+		this.el.addEventListener(
+			'keydown',
+			this.handleRippleEvent.bind(this, true)
+		);
 	}
 }
 
-export default function rippleButtons(btns) {
-	btns.forEach(btn => {
-		new paperRipple(btn)
-	})
+const btn = document.querySelectorAll('button');
+const anchors = document.querySelectorAll('a');
+
+btn.forEach(btn => {
+	new RippleEffect(btn);
+});
+anchors.forEach(anchor => {
+	new RippleEffect(anchor);
+});
+
+export default function rippleElement(el) {
+	const elType = el.tagName.toLowerCase();
+	const elStatement = elType === 'button' || elType === 'a';
+
+	if (elStatement) return;
+
+	new RippleEffect(el);
 }
